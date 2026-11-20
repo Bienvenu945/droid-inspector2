@@ -60,7 +60,8 @@ fun ReportsScreen(viewModel: InspectionViewModel = hiltViewModel(), modifier: Mo
                         page.canvas.drawText(safeLine, 40f, y, p)
                         y += 16f
                     }
-                    page.canvas.drawText("Page ${index + 1}/${pageLines.size}", 500f, 820f, paint)
+                    page.canvas.drawText("DROID INSPECTOR X — @Bienvenu · Diagnostic local, sans transmission", 40f, 820f, paint)
+                    page.canvas.drawText("${index + 1}/${pageLines.size}", 535f, 820f, paint)
                     pdf.finishPage(page)
                 }
                 context.contentResolver.openOutputStream(uri)?.use { pdf.writeTo(it) }

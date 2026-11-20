@@ -96,7 +96,7 @@ fun AboutScreen(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "Version 0.4.0 · Phase 4 — Feature completion",
+                    text = "Version 0.5.0 · Adaptive UI release",
                     fontSize = 11.sp,
                     color = TextMutedDark
                 )

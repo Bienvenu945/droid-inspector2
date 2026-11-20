@@ -2,10 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Basic diagnostic and hardware inspection permissions -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    
+    <!-- No INTERNET permission: diagnostics remain local to this device. -->
+
     <!-- Package discovery query specification (Android 11+ Package Visibility) -->
     <queries>
         <intent>

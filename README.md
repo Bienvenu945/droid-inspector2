@@ -14,7 +14,8 @@ Droid Inspector X est une application Android native d'inspection et de diagnost
 - **Storage Analyzer** : volumes et espace disponible.
 - **System Inspector** : identité du terminal, version Android, build, correctif de sécurité, SELinux et indicateurs système accessibles.
 - **Report Center** : export local d'un rapport PDF via le sélecteur de fichiers Android.
-- **More** : accès aux modules complémentaires et à la page À propos.
+- **Navigation adaptative** : barre inférieure sur téléphone compact, rail latéral sur les écrans d'au moins 600 dp.
+- **Dashboard adaptatif** : jauges et raccourcis réorganisés selon la largeur, contenu centré sur tablette et grand écran.
 
 ## Architecture
 
@@ -38,17 +39,36 @@ Prérequis : JDK 17 et Android SDK Platform 35.
 
 ```bash
 chmod +x gradlew
-./gradlew testDebugUnitTest
-./gradlew assembleDebug
-./gradlew assembleRelease
+./gradlew :app:testDebugUnitTest
+./gradlew :app:assembleDebug
+./gradlew :app:assembleRelease
 ```
 
 APK debug : `app/build/outputs/apk/debug/app-debug.apk`.
 
 ## Version du code source
 
-- Version applicative : **0.4.0**
-- Base : Phase 3
-- Évolution : activation des modules Sensors, Applications, System et Reports avec données réelles et export PDF.
+- Version applicative : **0.5.0**
+- Signature officielle : **@Bienvenu**
+- Évolution : refonte visuelle Emerald Frosted Glass, navigation adaptative et tableau de bord responsive.
+- CI : tests unitaires du module `app`, compilation Debug et Release, publication des APK comme Artifacts GitHub.
 
 © @Bienvenu — DROID INSPECTOR X
+
+## Interface adaptative
+
+- Fenêtre compacte (moins de 600 dp) : navigation inférieure à cinq destinations.
+- Fenêtre étendue (600 dp et plus) : navigation latérale.
+- Contenu limité à 1180 dp et centré sur les grandes fenêtres.
+- Le tableau de bord passe de deux cartes de ressources à trois cartes sur les largeurs étendues ; les raccourcis passent de deux à trois colonnes.
+
+## Signature Release (facultative)
+
+La CI produit toujours un APK Debug installable pour les tests. Pour signer aussi l'APK Release, configure les secrets du dépôt GitHub :
+
+- `KEYSTORE_BASE64` : fichier keystore encodé en Base64.
+- `KEY_ALIAS` : alias de la clé.
+- `KEYSTORE_PASSWORD` : mot de passe du keystore.
+- `KEY_PASSWORD` : mot de passe de la clé.
+
+Sans ces secrets, le build Release est généré sans signature personnalisée. Ne place jamais le keystore ni ses mots de passe dans le dépôt Git.

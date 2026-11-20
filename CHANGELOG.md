@@ -1,11 +1,22 @@
-# Changelog
+# Changelog — Droid Inspector X
+
+## 0.5.0 — Adaptive UI & Emerald Frosted Glass
+
+- Refonte du tableau de bord : hiérarchie visuelle, cartes émeraude, jauges animées et raccourcis de diagnostic.
+- Interface adaptative : navigation inférieure sur les fenêtres compactes et navigation latérale sur les fenêtres de 600 dp et plus.
+- Contenu centré avec largeur maximale pour éviter les lignes trop longues sur tablettes et grands écrans.
+- Navigation principale alignée sur Dashboard, Hardware, Batterie, Capteurs et Stockage.
+- Ajout d'un accès direct à Applications, Système, Rapports et À propos depuis le tableau de bord.
+- Signature officielle harmonisée : `@Bienvenu`.
+- Suppression des permissions d'état réseau/Wi-Fi non nécessaires ; aucune permission INTERNET.
+- CI : acceptation automatisée des licences SDK, tests unitaires ciblés sur `:app`, builds Debug et Release.
 
 ## 0.4.0 — Feature completion
 
-- Remplacement des écrans fictifs Capteurs, Applications, Système et Rapports.
-- Lecture des capteurs physiques en direct avec arrêt de l'écoute lorsque l'écran n'est plus actif.
-- Inventaire des applications visibles, recherche, filtre système et détail des permissions déclarées.
-- Informations système réelles : identité du terminal, build, correctif, SELinux et indicateurs accessibles.
-- Génération d'un rapport PDF local via le Storage Access Framework, avec pagination.
-- Ajout d'un écran Plus pour accéder aux modules complémentaires.
-- Mise à jour de la documentation et de la CI pour compiler Debug et Release.
+- Inventaire réel des capteurs, applications installées et informations système.
+- Export PDF local via Storage Access Framework.
+- Navigation vers les modules d'inspection et informations À propos.
+
+## 0.3.0 — Phase 3
+
+- Base de l'application Android native et modules de diagnostic initiaux.

@@ -1,28 +1,48 @@
 package com.droidinspector.feature.dashboard
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.BatteryChargingFull
-import androidx.compose.material.icons.rounded.DeviceThermostat
-import androidx.compose.material.icons.rounded.Storage
+import androidx.compose.material.icons.rounded.Description
+import androidx.compose.material.icons.rounded.FolderOpen
 import androidx.compose.material.icons.rounded.Memory
 import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Sensors
+import androidx.compose.material.icons.rounded.SettingsSuggest
 import androidx.compose.material.icons.rounded.Smartphone
-import androidx.compose.material3.*
+import androidx.compose.material.icons.rounded.Storage
+import androidx.compose.material.icons.rounded.VerifiedUser
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,532 +53,391 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.droidinspector.core.navigation.Screen
 import com.droidinspector.core.theme.BackgroundDark
 import com.droidinspector.core.theme.EmeraldDark
 import com.droidinspector.core.theme.EmeraldLight
 import com.droidinspector.core.theme.EmeraldPrimary
 import com.droidinspector.core.theme.SurfaceCard
 import com.droidinspector.core.theme.SurfaceDark
-import com.droidinspector.core.theme.SurfaceGlass
 import com.droidinspector.core.theme.SurfaceGlassBorder
 import com.droidinspector.core.theme.TextMutedDark
 import com.droidinspector.core.theme.TextPrimaryDark
 import com.droidinspector.core.theme.TextSecondaryDark
 
-/**
- * Écran Dashboard principal de Droid Inspector X.
- * Affiche en temps réel :
- * - Appareil : Marque & Modèle
- * - Android : Version & Niveau API
- * - RAM : Utilisée / Totale
- * - Stockage interne : Utilisé / Total
- * - Batterie : Niveau, État de charge, Température
- * Rafraîchissement automatique toutes les 2 secondes.
- *
- * Signature : @Bienvenu
- */
 @Composable
 fun DashboardScreen(
     viewModel: DashboardViewModel,
+    navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    // Récupération de l'état avec collectAsState() selon contraintes
     val state by viewModel.uiState.collectAsState()
-    val scrollState = rememberScrollState()
 
-    Column(
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
             .background(BackgroundDark)
-            .verticalScroll(scrollState)
-            .padding(horizontal = 16.dp, vertical = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // En-tête : Titre & Signature officielle @Bienvenu
-        DashboardHeader()
-
-        // 1. Carte Appareil & Plateforme Android
-        DeviceIdentityCard(state = state)
-
-        // 2. Section Métriques en Temps Réel (RAM & Stockage avec jauges)
-        Text(
-            text = "MÉMOIRE & STOCKAGE",
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace,
-            color = EmeraldLight,
-            letterSpacing = 1.sp,
-            modifier = Modifier.padding(start = 4.dp, top = 4.dp)
-        )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            // Carte RAM
-            ResourceGaugeCard(
-                title = "RAM",
-                icon = Icons.Rounded.Memory,
-                usedFormatted = state.ramUsedFormatted,
-                totalFormatted = state.ramTotalFormatted,
-                percentage = state.ramUsagePercentage,
-                modifier = Modifier.weight(1f)
-            )
-
-            // Carte Stockage interne
-            ResourceGaugeCard(
-                title = "Stockage",
-                icon = Icons.Rounded.Storage,
-                usedFormatted = state.storageUsedFormatted,
-                totalFormatted = state.storageTotalFormatted,
-                percentage = state.storageUsagePercentage,
-                modifier = Modifier.weight(1f)
-            )
+        val wide = maxWidth >= 720.dp
+        val horizontalPadding = when {
+            maxWidth >= 1000.dp -> 36.dp
+            maxWidth >= 600.dp -> 28.dp
+            else -> 18.dp
         }
 
-        // 3. Section Batterie (Niveau, État de charge, Température)
-        Text(
-            text = "ÉNERGIE & ACCUMULATEUR",
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace,
-            color = EmeraldLight,
-            letterSpacing = 1.sp,
-            modifier = Modifier.padding(start = 4.dp, top = 4.dp)
-        )
+        Column(
+            modifier = Modifier
+                .widthIn(max = 1180.dp)
+                .align(Alignment.TopCenter)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = horizontalPadding, vertical = 22.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            DashboardTopBar()
+            DeviceHeroCard(state)
 
-        BatteryMonitorCard(state = state)
+            SectionHeading(
+                title = "ÉTAT DU TERMINAL",
+                subtitle = "Ressources système actualisées automatiquement"
+            )
 
-        // Pied de page : Signature et horloge de polling 2s
-        DashboardFooter()
+            if (wide) {
+                Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                    MetricCard(
+                        modifier = Modifier.weight(1f),
+                        title = "Mémoire vive",
+                        icon = Icons.Rounded.Memory,
+                        value = state.ramUsagePercentage,
+                        primary = "${state.ramUsagePercentage.toInt()}%",
+                        detail = "${state.ramUsedFormatted} utilisés",
+                        footer = "sur ${state.ramTotalFormatted}"
+                    )
+                    MetricCard(
+                        modifier = Modifier.weight(1f),
+                        title = "Stockage interne",
+                        icon = Icons.Rounded.Storage,
+                        value = state.storageUsagePercentage,
+                        primary = "${state.storageUsagePercentage.toInt()}%",
+                        detail = "${state.storageUsedFormatted} utilisés",
+                        footer = "sur ${state.storageTotalFormatted}"
+                    )
+                    MetricCard(
+                        modifier = Modifier.weight(1f),
+                        title = "Batterie",
+                        icon = Icons.Rounded.BatteryChargingFull,
+                        value = state.batteryLevel.toFloat(),
+                        primary = "${state.batteryLevel}%",
+                        detail = state.batteryStatusText.ifBlank { "État indisponible" },
+                        footer = if (state.batteryTemperature > 0f) "${state.batteryTemperature} °C" else "Température indisponible"
+                    )
+                }
+            } else {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    MetricCard(
+                        modifier = Modifier.weight(1f),
+                        title = "Mémoire vive",
+                        icon = Icons.Rounded.Memory,
+                        value = state.ramUsagePercentage,
+                        primary = "${state.ramUsagePercentage.toInt()}%",
+                        detail = "${state.ramUsedFormatted} utilisés",
+                        footer = "sur ${state.ramTotalFormatted}"
+                    )
+                    MetricCard(
+                        modifier = Modifier.weight(1f),
+                        title = "Stockage",
+                        icon = Icons.Rounded.Storage,
+                        value = state.storageUsagePercentage,
+                        primary = "${state.storageUsagePercentage.toInt()}%",
+                        detail = "${state.storageUsedFormatted} utilisés",
+                        footer = "sur ${state.storageTotalFormatted}"
+                    )
+                }
+                BatteryWideCard(state)
+            }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            SectionHeading(
+                title = "OUTILS DE DIAGNOSTIC",
+                subtitle = "Accès direct aux modules d'inspection"
+            )
+
+            val shortcuts = listOf(
+                DiagnosticShortcut("Hardware Explorer", "Processeur, RAM et écran", Icons.Rounded.Memory, Screen.Hardware.route),
+                DiagnosticShortcut("Laboratoire capteurs", "Mesures et capteurs détectés", Icons.Rounded.Sensors, Screen.Sensors.route),
+                DiagnosticShortcut("Gestionnaire d'apps", "Applications installées", Icons.Rounded.Apps, Screen.Applications.route),
+                DiagnosticShortcut("Analyse système", "Version Android et sécurité", Icons.Rounded.SettingsSuggest, Screen.System.route),
+                DiagnosticShortcut("Explorateur stockage", "Espace et fichiers accessibles", Icons.Rounded.FolderOpen, Screen.Storage.route),
+                DiagnosticShortcut("Rapports PDF", "Exporter un diagnostic local", Icons.Rounded.Description, Screen.Reports.route),
+                DiagnosticShortcut("À propos & auteur", "Confidentialité et informations", Icons.Rounded.VerifiedUser, Screen.About.route)
+            )
+
+            if (wide) {
+                shortcuts.chunked(3).forEach { rowItems ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        rowItems.forEach { item ->
+                            ShortcutCard(item, Modifier.weight(1f)) {
+                                navController.navigate(item.route) { launchSingleTop = true }
+                            }
+                        }
+                        repeat(3 - rowItems.size) { Spacer(Modifier.weight(1f)) }
+                    }
+                }
+            } else {
+                shortcuts.chunked(2).forEach { rowItems ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        rowItems.forEach { item ->
+                            ShortcutCard(item, Modifier.weight(1f)) {
+                                navController.navigate(item.route) { launchSingleTop = true }
+                            }
+                        }
+                        if (rowItems.size == 1) Spacer(Modifier.weight(1f))
+                    }
+                }
+            }
+
+            DashboardFooter()
+        }
     }
 }
 
-/**
- * En-tête de l'application avec signature @Bienvenu et badge de rafraîchissement 2s.
- */
 @Composable
-private fun DashboardHeader() {
+private fun DashboardTopBar() {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
+        Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
             Text(
                 text = "DROID INSPECTOR X",
-                fontSize = 20.sp,
+                color = TextPrimaryDark,
+                fontSize = 21.sp,
                 fontWeight = FontWeight.ExtraBold,
-                fontFamily = FontFamily.SansSerif,
-                letterSpacing = 0.5.sp,
-                color = TextPrimaryDark
+                letterSpacing = 0.7.sp
             )
             Text(
-                text = "Diagnostic Système par @Bienvenu",
-                fontSize = 12.sp,
-                color = EmeraldLight,
-                fontWeight = FontWeight.Medium
+                text = "Android System Intelligence & Diagnostics",
+                color = TextSecondaryDark,
+                fontSize = 11.sp
             )
         }
-
-        // Indicateur vert glacé de rafraîchissement 2s
         Row(
-            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .clip(RoundedCornerShape(20.dp))
-                .background(SurfaceCard)
-                .border(1.dp, SurfaceGlassBorder, RoundedCornerShape(20.dp))
-                .padding(horizontal = 10.dp, vertical = 6.dp)
+                .clip(CircleShape)
+                .background(EmeraldPrimary.copy(alpha = 0.12f))
+                .border(1.dp, EmeraldPrimary.copy(alpha = 0.28f), CircleShape)
+                .padding(horizontal = 11.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Rounded.Refresh,
-                contentDescription = null,
-                tint = EmeraldPrimary,
-                modifier = Modifier.size(12.dp)
-            )
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(
-                text = "2s LIVE",
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.Monospace,
-                color = EmeraldLight
-            )
+            Box(Modifier.size(7.dp).clip(CircleShape).background(EmeraldLight))
+            Spacer(Modifier.width(7.dp))
+            Text("LIVE · 2 S", color = EmeraldLight, fontSize = 10.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
         }
     }
 }
 
-/**
- * Carte affichant Marque, Modèle, Version Android et Niveau d'API.
- */
 @Composable
-private fun DeviceIdentityCard(state: DashboardUiState) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
-            .background(
-                Brush.linearGradient(
-                    colors = listOf(
-                        SurfaceCard,
-                        SurfaceGlass
-                    )
-                )
-            )
-            .border(1.dp, SurfaceGlassBorder, RoundedCornerShape(18.dp))
-            .padding(18.dp)
+private fun DeviceHeroCard(state: DashboardUiState) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        color = Color.Transparent,
+        border = androidx.compose.foundation.BorderStroke(1.dp, EmeraldPrimary.copy(alpha = 0.24f))
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+        Box(
+            modifier = Modifier
+                .background(Brush.linearGradient(listOf(Color(0xFF123D2D), Color(0xFF0D2119), Color(0xFF0A1410))))
+                .padding(22.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(38.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(EmeraldDark.copy(alpha = 0.35f))
-                            .border(1.dp, EmeraldPrimary.copy(alpha = 0.3f), RoundedCornerShape(10.dp)),
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(15.dp))
+                            .background(EmeraldPrimary.copy(alpha = 0.16f)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Smartphone,
-                            contentDescription = null,
-                            tint = EmeraldLight,
-                            modifier = Modifier.size(20.dp)
+                        Icon(Icons.Rounded.Smartphone, contentDescription = null, tint = EmeraldLight, modifier = Modifier.size(26.dp))
+                    }
+                    Spacer(Modifier.width(14.dp))
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text("APPAREIL ANALYSÉ", color = EmeraldLight, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.3.sp)
+                        Text(
+                            text = if (state.isLoaded) "${state.manufacturer} ${state.model}" else "Identification du terminal…",
+                            color = TextPrimaryDark,
+                            fontSize = 19.sp,
+                            fontWeight = FontWeight.Bold
                         )
                     }
-
-                    Spacer(modifier = Modifier.width(12.dp))
-
-                    Column {
-                        Text(
-                            text = if (state.isLoaded) "${state.manufacturer} ${state.model}" else "Chargement...",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TextPrimaryDark
-                        )
-                        Text(
-                            text = "Matériel détecté",
-                            fontSize = 11.sp,
-                            color = TextMutedDark
-                        )
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(9.dp))
+                            .background(EmeraldPrimary.copy(alpha = 0.16f))
+                            .padding(horizontal = 10.dp, vertical = 7.dp)
+                    ) {
+                        Text("API ${state.apiLevel.takeIf { it > 0 } ?: "--"}", color = EmeraldLight, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, fontSize = 11.sp)
                     }
                 }
-
-                // Badge niveau API
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(EmeraldPrimary.copy(alpha = 0.15f))
-                        .border(1.dp, EmeraldPrimary.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                ) {
-                    Text(
-                        text = "API ${state.apiLevel}",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Monospace,
-                        color = EmeraldLight
-                    )
-                }
-            }
-
-            HorizontalDivider(color = Color.White.copy(alpha = 0.08f), thickness = 1.dp)
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column {
-                    Text(text = "VERSION ANDROID", fontSize = 10.sp, color = TextMutedDark, fontFamily = FontFamily.Monospace)
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = if (state.isLoaded) "Android ${state.androidVersion}" else "--",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = TextPrimaryDark
-                    )
-                }
-
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(text = "CONSTRUCTEUR", fontSize = 10.sp, color = TextMutedDark, fontFamily = FontFamily.Monospace)
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = if (state.isLoaded) state.manufacturer else "--",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = TextPrimaryDark
-                    )
+                Box(Modifier.fillMaxWidth().height(1.dp).background(Color.White.copy(alpha = 0.10f)))
+                Row(horizontalArrangement = Arrangement.spacedBy(28.dp)) {
+                    DeviceInfoItem("PLATEFORME", if (state.isLoaded) "Android ${state.androidVersion}" else "--", Modifier.weight(1f))
+                    DeviceInfoItem("FABRICANT", if (state.isLoaded) state.manufacturer else "--", Modifier.weight(1f))
+                    DeviceInfoItem("SIGNATURE", "@Bienvenu", Modifier.weight(1f))
                 }
             }
         }
     }
 }
 
-/**
- * Carte affichant une jauge circulaire animée pour la RAM ou le stockage.
- */
 @Composable
-private fun ResourceGaugeCard(
+private fun DeviceInfoItem(label: String, value: String, modifier: Modifier = Modifier) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(5.dp)) {
+        Text(label, color = TextMutedDark, fontSize = 9.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.7.sp)
+        Text(value, color = TextPrimaryDark, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 2)
+    }
+}
+
+@Composable
+private fun SectionHeading(title: String, subtitle: String) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(title, color = EmeraldLight, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.15.sp)
+        Text(subtitle, color = TextMutedDark, fontSize = 11.sp)
+    }
+}
+
+@Composable
+private fun MetricCard(
+    modifier: Modifier = Modifier,
     title: String,
     icon: ImageVector,
-    usedFormatted: String,
-    totalFormatted: String,
-    percentage: Float,
-    modifier: Modifier = Modifier
+    value: Float,
+    primary: String,
+    detail: String,
+    footer: String
 ) {
-    Box(
+    Column(
         modifier = modifier
-            .clip(RoundedCornerShape(18.dp))
-            .background(SurfaceGlass)
-            .border(1.dp, SurfaceGlassBorder, RoundedCornerShape(18.dp))
-            .padding(16.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(Brush.linearGradient(listOf(Color(0xFF12251C), SurfaceDark)))
+            .border(1.dp, SurfaceGlassBorder, RoundedCornerShape(20.dp))
+            .padding(15.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(9.dp)
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        tint = EmeraldLight,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = title,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimaryDark
-                    )
-                }
-            }
-
-            // Jauge circulaire animée
-            CircularProgressGauge(
-                percentage = percentage,
-                size = 90.dp,
-                strokeWidth = 8.dp
-            )
-
-            // Détails utilisés / total
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "$usedFormatted / $totalFormatted",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = TextPrimaryDark,
-                    fontFamily = FontFamily.Monospace
-                )
-                Text(
-                    text = "Utilisé",
-                    fontSize = 10.sp,
-                    color = TextMutedDark
-                )
-            }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, contentDescription = null, tint = EmeraldLight, modifier = Modifier.size(17.dp))
+            Spacer(Modifier.width(7.dp))
+            Text(title, color = TextPrimaryDark, fontWeight = FontWeight.SemiBold, fontSize = 12.sp, maxLines = 1)
         }
+        MetricRing(value = value, primary = primary, size = 82.dp)
+        Text(detail, color = TextPrimaryDark, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+        Text(footer, color = TextMutedDark, fontSize = 10.sp, maxLines = 1)
     }
 }
 
-/**
- * Jauge circulaire animée vert glacé futuriste.
- */
 @Composable
-private fun CircularProgressGauge(
-    percentage: Float,
-    size: Dp,
-    strokeWidth: Dp
-) {
-    val animatedProgress = remember { Animatable(0f) }
-
-    LaunchedEffect(percentage) {
-        animatedProgress.animateTo(
-            targetValue = (percentage / 100f).coerceIn(0f, 1f),
-            animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing)
-        )
-    }
-
-    Box(
-        modifier = Modifier.size(size),
-        contentAlignment = Alignment.Center
-    ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val stroke = Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Round)
-            // Cercle d'arrière-plan
-            drawCircle(
-                color = SurfaceCard,
-                style = stroke
-            )
-            // Arc de progression vert glacé
+private fun MetricRing(value: Float, primary: String, size: androidx.compose.ui.unit.Dp) {
+    val progress by animateFloatAsState(
+        targetValue = (value / 100f).coerceIn(0f, 1f),
+        animationSpec = tween(650),
+        label = "metric-ring"
+    )
+    Box(Modifier.size(size), contentAlignment = Alignment.Center) {
+        Canvas(Modifier.fillMaxSize()) {
             drawArc(
-                color = EmeraldPrimary,
+                color = Color(0xFF20372C),
                 startAngle = -90f,
-                sweepAngle = 360f * animatedProgress.value,
+                sweepAngle = 360f,
                 useCenter = false,
-                style = stroke
+                style = Stroke(width = 8.dp.toPx(), cap = StrokeCap.Round)
+            )
+            drawArc(
+                brush = Brush.sweepGradient(listOf(EmeraldDark, EmeraldLight, EmeraldPrimary)),
+                startAngle = -90f,
+                sweepAngle = 360f * progress,
+                useCenter = false,
+                style = Stroke(width = 8.dp.toPx(), cap = StrokeCap.Round)
             )
         }
-
-        Text(
-            text = "${(animatedProgress.value * 100).toInt()}%",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.Monospace,
-            color = TextPrimaryDark
-        )
+        Text(primary, color = TextPrimaryDark, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, fontSize = 16.sp)
     }
 }
 
-/**
- * Carte de surveillance de la batterie (Niveau, État de charge, Température).
- */
 @Composable
-private fun BatteryMonitorCard(state: DashboardUiState) {
-    Box(
+private fun BatteryWideCard(state: DashboardUiState) {
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
-            .background(SurfaceGlass)
-            .border(1.dp, SurfaceGlassBorder, RoundedCornerShape(18.dp))
-            .padding(18.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(SurfaceCard)
+            .border(1.dp, SurfaceGlassBorder, RoundedCornerShape(20.dp))
+            .padding(17.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(EmeraldDark.copy(alpha = 0.35f))
-                            .border(1.dp, EmeraldPrimary.copy(alpha = 0.3f), RoundedCornerShape(10.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.BatteryChargingFull,
-                            contentDescription = null,
-                            tint = EmeraldLight,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Text(
-                            text = "Batterie",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TextPrimaryDark
-                        )
-                        Text(
-                            text = state.batteryStatusText,
-                            fontSize = 11.sp,
-                            color = if (state.isCharging) EmeraldLight else TextSecondaryDark
-                        )
-                    }
-                }
-
-                // Pourcentage principal
-                Text(
-                    text = "${state.batteryLevel}%",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace,
-                    color = EmeraldLight
-                )
-            }
-
-            // Barre de niveau de batterie animée
-            LinearProgressIndicator(
-                progress = { (state.batteryLevel / 100f).coerceIn(0f, 1f) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-                    .clip(RoundedCornerShape(4.dp)),
-                color = EmeraldPrimary,
-                trackColor = SurfaceCard,
-            )
-
-            // Sous-métriques : État de charge et Température en °C
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Rounded.DeviceThermostat,
-                        contentDescription = null,
-                        tint = EmeraldLight,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "Température :",
-                        fontSize = 12.sp,
-                        color = TextMutedDark
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "${state.batteryTemperature} °C",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        fontFamily = FontFamily.Monospace,
-                        color = TextPrimaryDark
-                    )
-                }
-
-                Text(
-                    text = if (state.isCharging) "Charge active" else "Sur batterie",
-                    fontSize = 11.sp,
-                    fontFamily = FontFamily.Monospace,
-                    color = if (state.isCharging) EmeraldLight else TextMutedDark
-                )
-            }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Rounded.BatteryChargingFull, contentDescription = null, tint = EmeraldLight)
+            Spacer(Modifier.width(9.dp))
+            Text("Batterie", color = TextPrimaryDark, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+            Text("${state.batteryLevel}%", color = EmeraldLight, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, fontSize = 19.sp)
+        }
+        LinearProgressIndicator(
+            progress = { (state.batteryLevel / 100f).coerceIn(0f, 1f) },
+            modifier = Modifier.fillMaxWidth().height(8.dp).clip(CircleShape),
+            color = EmeraldPrimary,
+            trackColor = SurfaceDark
+        )
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(state.batteryStatusText.ifBlank { "État indisponible" }, color = TextSecondaryDark, fontSize = 11.sp)
+            Text(if (state.batteryTemperature > 0f) "${state.batteryTemperature} °C" else "Température indisponible", color = TextSecondaryDark, fontSize = 11.sp)
         }
     }
 }
 
-/**
- * Pied de page avec signature officielle @Bienvenu.
- */
+private data class DiagnosticShortcut(
+    val title: String,
+    val description: String,
+    val icon: ImageVector,
+    val route: String
+)
+
+@Composable
+private fun ShortcutCard(item: DiagnosticShortcut, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(17.dp))
+            .background(SurfaceCard)
+            .border(1.dp, SurfaceGlassBorder, RoundedCornerShape(17.dp))
+            .clickable(onClick = onClick)
+            .padding(14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            Modifier.size(38.dp).clip(RoundedCornerShape(12.dp)).background(EmeraldPrimary.copy(alpha = 0.13f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(item.icon, contentDescription = null, tint = EmeraldLight, modifier = Modifier.size(20.dp))
+        }
+        Spacer(Modifier.width(11.dp))
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Text(item.title, color = TextPrimaryDark, fontWeight = FontWeight.SemiBold, fontSize = 11.sp, maxLines = 2)
+            Text(item.description, color = TextMutedDark, fontSize = 9.sp, maxLines = 2, lineHeight = 12.sp)
+        }
+    }
+}
+
 @Composable
 private fun DashboardFooter() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp),
-        contentAlignment = Alignment.Center
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 3.dp, bottom = 12.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "DROID INSPECTOR X — @Bienvenu",
-            fontSize = 11.sp,
-            fontFamily = FontFamily.Monospace,
-            color = TextMutedDark,
-            letterSpacing = 0.5.sp
-        )
+        Icon(Icons.Rounded.Refresh, contentDescription = null, tint = EmeraldDark, modifier = Modifier.size(12.dp))
+        Spacer(Modifier.width(6.dp))
+        Text("Données locales · Actualisation toutes les 2 secondes · @Bienvenu", color = TextMutedDark, fontSize = 9.sp)
     }
 }

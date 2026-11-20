@@ -25,7 +25,7 @@ import com.droidinspector.feature.system.SystemScreen
 @Composable
 fun NavGraph(navController: NavHostController, modifier: Modifier = Modifier) {
     NavHost(navController = navController, startDestination = Screen.Dashboard.route, modifier = modifier) {
-        composable(Screen.Dashboard.route) { DashboardScreen(viewModel = hiltViewModel<DashboardViewModel>()) }
+        composable(Screen.Dashboard.route) { DashboardScreen(viewModel = hiltViewModel<DashboardViewModel>(), navController = navController) }
         composable(Screen.Hardware.route) { HardwareScreen(viewModel = hiltViewModel<HardwareViewModel>()) }
         composable(Screen.Battery.route) { BatteryScreen(viewModel = hiltViewModel<BatteryViewModel>()) }
         composable(Screen.Sensors.route) { SensorLabScreen(viewModel = hiltViewModel<InspectionViewModel>()) }
