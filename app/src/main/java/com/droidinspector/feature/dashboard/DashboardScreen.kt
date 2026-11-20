@@ -169,7 +169,8 @@ fun DashboardScreen(
                 DiagnosticShortcut("Laboratoire capteurs", "Mesures et capteurs détectés", Icons.Rounded.Sensors, Screen.Sensors.route),
                 DiagnosticShortcut("Gestionnaire d'apps", "Applications installées", Icons.Rounded.Apps, Screen.Applications.route),
                 DiagnosticShortcut("Analyse système", "Version Android et sécurité", Icons.Rounded.SettingsSuggest, Screen.System.route),
-                DiagnosticShortcut("Explorateur stockage", "Espace et fichiers accessibles", Icons.Rounded.FolderOpen, Screen.Storage.route),
+                DiagnosticShortcut("Analyse stockage", "Volumes et espace disponible", Icons.Rounded.Storage, Screen.Storage.route),
+                DiagnosticShortcut("File Explorer", "Parcourir et gérer les fichiers", Icons.Rounded.FolderOpen, Screen.FileExplorer.route),
                 DiagnosticShortcut("Rapports PDF", "Exporter un diagnostic local", Icons.Rounded.Description, Screen.Reports.route),
                 DiagnosticShortcut("À propos & auteur", "Confidentialité et informations", Icons.Rounded.VerifiedUser, Screen.About.route)
             )

@@ -12,6 +12,7 @@ Droid Inspector X est une application Android native d'inspection et de diagnost
 - **Sensor Lab** : inventaire des capteurs détectés et lecture en direct du capteur sélectionné.
 - **App Manager** : recherche et inventaire des applications visibles pour l'application, version, SDK cible, dates et permissions déclarées.
 - **Storage Analyzer** : volumes et espace disponible.
+- **File Explorer** : navigation SAF dans les dossiers autorisés, recherche, tri, fichiers cachés, propriétés, ouverture, création de dossiers, renommage et suppression selon les droits accordés.
 - **System Inspector** : identité du terminal, version Android, build, correctif de sécurité, SELinux et indicateurs système accessibles.
 - **Report Center** : export local d'un rapport PDF via le sélecteur de fichiers Android.
 - **Navigation adaptative** : barre inférieure sur téléphone compact, rail latéral sur les écrans d'au moins 600 dp.
@@ -29,7 +30,7 @@ Droid Inspector X est une application Android native d'inspection et de diagnost
 
 ## Confidentialité et limites Android
 
-Les mesures sont effectuées localement. L'application ne demande pas l'accès Internet. Android limite volontairement les informations visibles par les applications ordinaires : certaines fréquences CPU, informations de batterie, packages installés ou propriétés système peuvent donc être indisponibles. Une valeur non exposée n'est jamais remplacée par une donnée inventée.
+Les mesures et l’exploration des fichiers sont effectuées localement. Le File Explorer n’accède qu’aux dossiers choisis explicitement par l’utilisateur via le sélecteur Android. Les opérations de renommage et de suppression dépendent des capacités exposées par le fournisseur de documents. L’application ne demande pas l’accès Internet. Android limite volontairement les informations visibles par les applications ordinaires : certaines fréquences CPU, informations de batterie, packages installés ou propriétés système peuvent donc être indisponibles. Une valeur non exposée n'est jamais remplacée par une donnée inventée.
 
 Les indicateurs SELinux/root sont informatifs et ne constituent pas une certification de sécurité. L'inventaire d'applications respecte les règles de visibilité des packages Android.
 
@@ -48,9 +49,9 @@ APK debug : `app/build/outputs/apk/debug/app-debug.apk`.
 
 ## Version du code source
 
-- Version applicative : **0.5.0**
+- Version applicative : **0.6.0**
 - Signature officielle : **@Bienvenu**
-- Évolution : refonte visuelle Emerald Frosted Glass, navigation adaptative et tableau de bord responsive.
+- Évolution : File Explorer SAF, refonte visuelle Emerald Frosted Glass, navigation adaptative et tableau de bord responsive.
 - CI : tests unitaires du module `app`, compilation Debug et Release, publication des APK comme Artifacts GitHub.
 
 © @Bienvenu — DROID INSPECTOR X

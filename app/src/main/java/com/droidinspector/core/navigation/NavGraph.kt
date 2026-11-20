@@ -14,6 +14,7 @@ import com.droidinspector.feature.dashboard.DashboardScreen
 import com.droidinspector.feature.dashboard.DashboardViewModel
 import com.droidinspector.feature.hardware.HardwareScreen
 import com.droidinspector.feature.hardware.HardwareViewModel
+import com.droidinspector.feature.files.FileExplorerScreen
 import com.droidinspector.feature.inspection.InspectionViewModel
 import com.droidinspector.feature.more.MoreScreen
 import com.droidinspector.feature.reports.ReportsScreen
@@ -31,6 +32,7 @@ fun NavGraph(navController: NavHostController, modifier: Modifier = Modifier) {
         composable(Screen.Sensors.route) { SensorLabScreen(viewModel = hiltViewModel<InspectionViewModel>()) }
         composable(Screen.Applications.route) { AppManagerScreen(viewModel = hiltViewModel<InspectionViewModel>()) }
         composable(Screen.Storage.route) { StorageScreen(viewModel = hiltViewModel<StorageViewModel>()) }
+        composable(Screen.FileExplorer.route) { FileExplorerScreen() }
         composable(Screen.System.route) { SystemScreen(viewModel = hiltViewModel<InspectionViewModel>()) }
         composable(Screen.Reports.route) { ReportsScreen(viewModel = hiltViewModel<InspectionViewModel>()) }
         composable(Screen.About.route) { AboutScreen(navController = navController) }

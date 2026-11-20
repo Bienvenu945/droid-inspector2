@@ -96,7 +96,7 @@ fun AboutScreen(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "Version 0.5.0 · Adaptive UI release",
+                    text = "Version 0.6.0 · File Explorer release",
                     fontSize = 11.sp,
                     color = TextMutedDark
                 )

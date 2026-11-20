@@ -5,6 +5,7 @@ import androidx.compose.material.icons.rounded.BatteryChargingFull
 import androidx.compose.material.icons.rounded.Dashboard
 import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.Folder
+import androidx.compose.material.icons.rounded.FolderOpen
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Memory
 import androidx.compose.material.icons.rounded.MoreHoriz
@@ -27,6 +28,7 @@ sealed class Screen(
     object Sensors : Screen("sensors", "Capteurs", Icons.Rounded.Sensors)
     object Applications : Screen("applications", "Applications", Icons.Rounded.Widgets)
     object Storage : Screen("storage", "Stockage", Icons.Rounded.Folder)
+    object FileExplorer : Screen("file-explorer", "Fichiers", Icons.Rounded.FolderOpen)
     object System : Screen("system", "Système", Icons.Rounded.Smartphone)
     object Reports : Screen("reports", "Rapports", Icons.Rounded.Description)
     object About : Screen("about", "À propos", Icons.Rounded.Info)
@@ -48,6 +50,7 @@ sealed class Screen(
             Sensors,
             Applications,
             Storage,
+            FileExplorer,
             System,
             Reports,
             About,

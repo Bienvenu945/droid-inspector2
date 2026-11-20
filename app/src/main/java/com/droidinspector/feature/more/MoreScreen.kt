@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.FolderOpen
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Sensors
 import androidx.compose.material3.Icon
@@ -31,6 +32,7 @@ private data class MoreEntry(val title: String, val subtitle: String, val icon: 
 @Composable
 fun MoreScreen(navController: NavController, modifier: Modifier = Modifier) {
     val entries = listOf(
+        MoreEntry("File Explorer", "Parcourir, rechercher et gérer les fichiers accessibles", Icons.Rounded.FolderOpen, Screen.FileExplorer.route),
         MoreEntry("Capteurs", "Inventaire des capteurs et mesures en direct", Icons.Rounded.Sensors, Screen.Sensors.route),
         MoreEntry("Applications", "Inventaire, versions et permissions déclarées", Icons.Rounded.Apps, Screen.Applications.route),
         MoreEntry("Système", "Build Android, sécurité et identité", Icons.Rounded.Settings, Screen.System.route),
