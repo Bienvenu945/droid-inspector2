@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Droid Inspector X</string>
+    <string name="app_author">@Bienvenu</string>
+    <string name="app_tagline">Android System Intelligence &amp; Diagnostics</string>
+</resources>

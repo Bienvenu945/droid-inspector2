@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="emerald_500">#10B981</color>
+    <color name="emerald_400">#34D399</color>
+    <color name="emerald_600">#059669</color>
+    <color name="background_dark">#050B08</color>
+    <color name="surface_dark">#0A1410</color>
+    <color name="surface_glass">#12201A</color>
+    <color name="text_primary">#F1F5F9</color>
+    <color name="text_secondary">#94A3B8</color>
+</resources>
