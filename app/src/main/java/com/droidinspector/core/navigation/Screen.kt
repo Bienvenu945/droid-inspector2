@@ -40,7 +40,8 @@ sealed class Screen(
             Hardware,
             Battery,
             Sensors,
-            Storage
+            Storage,
+            More
         )
 
         val drawerOrAllItems = listOf(
